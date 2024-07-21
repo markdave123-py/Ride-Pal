@@ -1,15 +1,12 @@
-import { tokenService } from "../services/token";
-import { HttpStatus } from "../../core/utils/statuscodes";
-import { UnAuthorizedError } from "../../core/errors/unAuthorizedError";
-import { ForbiddenError } from "../../core/errors/forbiddenError";
-import { config } from "../../core/config/env";
-import { AppMessages } from "../../core/common/appmessages";
+
+import { HttpStatus } from "../../core/utils/statuscodes.js";
+import { UnAuthorizedError } from "../../core/errors/unAuthorizedError.js";
+import { ForbiddenError } from "../../core/errors/forbiddenError.js";
+import { config } from "../../core/config/env.js";
+import { AppMessages } from "../../core/common/appmessages.js";
+import { extractTokenDetails } from "../services/token.js";
 
 class AuthGuard {
-  constructor(tokenService) {
-    this.tokenService = tokenService;
-    this.guard = this.guard.bind(this);
-  }
 
   async guard(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -33,7 +30,7 @@ class AuthGuard {
     const { accessTokenSecret } = config.auth;
 
     try {
-      const user = await this.tokenService.extractTokenDetails(
+      const user = await extractTokenDetails(
         token,
         accessTokenSecret
       );
@@ -48,12 +45,12 @@ class AuthGuard {
       } else {
         return res.status(HttpStatus.FORBIDDEN).json({
           code: HttpStatus.FORBIDDEN,
-          message: "Forbidden, you can't access this endpoint",
+          message: AppMessages.FAILURE.FORBIDDEN_RESOURCE,
         });
       }
     }
   }
 }
 
-const authGuard = new AuthGuard(tokenService);
+const authGuard = new AuthGuard();
 export { authGuard };

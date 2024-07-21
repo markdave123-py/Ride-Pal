@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import { config } from "./env.js";
 
 
-const { host, name, password, user } = config.db;
+const { host, name, password, user, url } = config.db;
 
 
 // export const sequelizeConn = new Sequelize(name, user, password, {
@@ -19,8 +19,7 @@ const { host, name, password, user } = config.db;
 // });
 
 
-export const sequelizeConn = new Sequelize(
-  "postgresql://ridepal_user:vLBOPCzAiM5T6egUCv5UEXoEcEYl8CNM@dpg-cqe0hspu0jms7392pd50-a.oregon-postgres.render.com/ridepal",
+export const sequelizeConn = new Sequelize(url,
   {
     // host: host,
     dialect: "postgres",

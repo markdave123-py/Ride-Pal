@@ -1,50 +1,53 @@
-import { userService } from "../../user/services/index.js";
 import { config } from "../../core/config/env.js";
-import { sanitizeUser } from "../../core/common/sanitize.js";
+import { sanitizeUser } from "../../core/utils/sanitize.js";
+import { comparePassword } from "../../core/utils/bcrypt.js";
+import { logger } from "../../core/loggers/logger.js";
+import { AppMessages } from "../../core/common/appmessages.js";
+import { ApiError } from "../../core/errors/apiErrors.js";
+import { InternalServerError } from "../../core/errors/internalServerError.js";
+import Auth from "../model/auth.model.js";
+import User from "../../user/model/user.js";
+import { getTokens } from "../services/token.js";
+import { HttpStatus } from "../../core/utils/statuscodes.js";
+import Admin from "../../user/model/admin.js";
+// Constructor replacement for SignInService
+const refreshTokenExpTime = config.auth.refreshTokenExpTime;
 
-class SignInService {
-  constructor(
-    dbAuth,
-    tokenService,
-    dbUser,
-    refreshTokenExpTime = config.auth.refreshTokenExpTime
-  ) {
-    this.dbAuth = dbAuth;
-    this.tokenService = tokenService;
-    this.dbUser = dbUser;
-    this.refreshTokenExpTime = refreshTokenExpTime;
-  }
+/**
+ * Handles user login, performs necessary validations, and generates tokens for authentication.
+ *
+ * @param {Request} req - The input request object.
+ * @param {Response} res - The response object.
+ * @returns {Promise<any>} The API response containing authentication tokens and user data.
+ * @throws {UnAuthorizedError} Thrown if login credentials are invalid or user email is not verified.
+ */
+async function signIn(req, res, next) {
+  try {
+    const { email, password } = req.body;
 
-  /**
-   * Handles user login, performs necessary validations, and generates tokens for authentication.
-   *
-   * @param {Request} req - The input request object.
-   * @param {Response} res - The response object.
-   * @returns {Promise<any>} The API response containing authentication tokens and user data.
-   * @throws {UnAuthorizedError} Thrown if login credentials are invalid or user email is not verified.
-   */
-  signIn = async (req, res) => {
-    const { error, value } = signInSchema.validate(req.body);
+    let user = await User.findOne({ where: { email } });
 
-    if (error) {
-      logger.error(error.details[0].message);
-      return res.json({
-        code: HttpStatus.BAD_REQUEST,
-        message: error.details[0].message,
-      });
+    let userType;[]
+
+    if (user) {
+      userType = user.type;
     }
 
-    const { email, password } = value;
-
-    const user = await userService.getUserByEmail(email);
-
+    if (!user) {
+      user = await Admin.findOne({ where: { email } });
+      if (user) {
+        userType = "admin";
+      }
+    }
+    
     if (!user) {
       logger.error(AppMessages.FAILURE.INVALID_CREDENTIALS);
       return res.json({
-        code: HttpStatus.UNAUTHORIZED,
+        code: HttpStatus.BAD_REQUEST,
         message: AppMessages.FAILURE.INVALID_CREDENTIALS,
       });
     }
+    // print(user)
 
     const isPasswordValid = await comparePassword(password, user.password);
 
@@ -56,19 +59,18 @@ class SignInService {
       });
     }
 
-    const [accessToken, refreshToken] = await this.tokenService.getTokens({
+    const [accessToken, refreshToken] = await getTokens({
       id: user.id,
       email: user.email,
-      type: user.userRole,
+      type: userType,
     });
 
     let expireAt = new Date();
     expireAt.setSeconds(
-      expireAt.getSeconds() +
-        parseInt(this.refreshTokenExpTime.slice(0, -1)) * 60
+      expireAt.getSeconds() + parseInt(refreshTokenExpTime.slice(0, -1)) * 60
     );
 
-    await this.dbAuth.update(
+    await Auth.update(
       {
         refreshToken: refreshToken,
         refreshTokenExp: expireAt,
@@ -87,8 +89,12 @@ class SignInService {
         user: sanitizeUser(user),
       },
     });
-  };
+  } catch (error) {
+    logger.error(error.message);
+    next(
+      error instanceof ApiError ? error : new InternalServerError(error.message)
+    );
+  }
 }
 
-const signInService = new SignInService(Auth, tokenService, User);
-export { signInService };
+export { signIn };

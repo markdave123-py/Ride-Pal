@@ -2,10 +2,19 @@ import User from "../../model/user.js";
 import { InternalServerError } from "../../../core/errors/internalServerError.js";
 import { RouteNotFoundError } from "../../../core/errors/notFoundError.js";
 import { BadRequestError } from "../../../core/errors/BadRequestError.js";
+import { ForbiddenError } from "../../../core/errors/forbiddenError.js"
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { logger } from "../../../core/loggers/logger.js";
 
 export const verifyUser = async (req, res, next) => {
+
+  const curruser = req.user;
+
+  if (curruser.type !== "admin") {
+    return next(
+      new ForbiddenError("You are not authorized to perform this action")
+    );
+  }
   const { userId } = req.body;
 
   try {

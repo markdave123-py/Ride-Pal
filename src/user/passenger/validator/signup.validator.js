@@ -17,7 +17,7 @@ export const passengerSignupSchema = Joi.object({
   firstName: Joi.string().required().messages({
     "any.required": "First name is required",
   }),
-  password: Joi.string().min(6).required().messages({
+  password: Joi.string().min(3).required().messages({
     "any.required": "Password is required",
   }),
   lastName: Joi.string().allow(null, ""),

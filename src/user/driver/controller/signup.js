@@ -1,6 +1,7 @@
 import cloudinary  from "../../../core/config/cloudinary.js"
 import User from "../../model/user.js";
 import Vehicle from "../../model/vehicle.js";
+import Auth from "../../../auth/model/auth.model.js";
 import { ConflictError } from "../../../core/errors/conflictError.js";
 import { InternalServerError } from "../../../core/errors/internalServerError.js";
 import { BadRequestError } from "../../../core/errors/BadRequestError.js";
@@ -102,6 +103,11 @@ export const signUpDriver = async (req, res, next) => {
       model,
       seatNumber,
       ownerId: user.id,
+    });
+
+    Auth.create({
+      userId: user.id,
+      email,
     });
 
     const sanitizedUser = sanitizeUser(user);

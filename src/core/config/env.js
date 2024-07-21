@@ -13,6 +13,7 @@ export const config = Object.freeze({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
     type: process.env.DB_TYPE,
+    url: process.env.DATABASE_URL,
   },
   auth: {
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
@@ -29,7 +30,6 @@ export const config = Object.freeze({
   mailsender: {
     email: process.env.MAIL_SENDER_EMAIL,
     password: process.env.MAIL_SENDER_PASSWORD,
-
   },
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
