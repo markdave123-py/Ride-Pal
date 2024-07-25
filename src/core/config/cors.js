@@ -4,7 +4,7 @@ import cors from "cors";
 const allowedOrigins = [
   "http://localhost:3000",
   "http://console.localhost:3000",
-  "",
+  "https://ridepal.vercel.app",
 ];
 
 const allowedMethods = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"];

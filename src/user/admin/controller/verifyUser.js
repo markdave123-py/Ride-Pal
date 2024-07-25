@@ -5,6 +5,7 @@ import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 import { ForbiddenError } from "../../../core/errors/forbiddenError.js"
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { logger } from "../../../core/loggers/logger.js";
+import { notifyUser } from "../../../core/utils/mailsender.js";
 
 export const verifyUser = async (req, res, next) => {
 
@@ -19,23 +20,25 @@ export const verifyUser = async (req, res, next) => {
 
   try {
     if (!userId) {
-      throw new BadRequestError("userId required");
+      return next( new BadRequestError("userId required"));
     }
 
     const user = await User.findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new RouteNotFoundError("User not found");
+      return next( new RouteNotFoundError("User not found"));
     }
 
     user.is_verified = true;
 
     await user.save();
 
+    await notifyUser(user.email);
+
     logger.info(`User with id ${userId} verified successfully`);
 
     res.status(200).json({ message: "User verified successfully", user });
   } catch (error) {
-    next(error instanceof ApiError ? error : new InternalServerError(error.message));
+    return next(error instanceof ApiError ? error : new InternalServerError(error.message));
   }
 };

@@ -8,7 +8,7 @@ import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 import { hashPassword } from "../../../core/utils/bcrypt.js";
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { sanitizeUser } from "../../../core/utils/sanitize.js";
-import { verifyDriver } from "../../../core/utils/mailsender.js";
+import { verifyUser } from "../../../core/utils/mailsender.js";
 
 export const signUpDriver = async (req, res, next) => {
   const {
@@ -116,7 +116,13 @@ export const signUpDriver = async (req, res, next) => {
       user: sanitizedUser,
       vehicle,
     };
-    await verifyDriver(driverDetails);
+
+    try {
+      await verifyUser(driverDetails);
+    } catch (error) {
+      return next(new InternalServerError(error.message));
+
+    }
 
     res
       .status(201)

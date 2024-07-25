@@ -7,7 +7,7 @@ import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 import { hashPassword } from "../../../core/utils/bcrypt.js";
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { sanitizeUser } from "../../../core/utils/sanitize.js";
-import { verifyPassenger } from "../../../core/utils/mailsender.js";
+import { verifyUser } from "../../../core/utils/mailsender.js";
 
 export const passengerSignup = async (req, res, next) => {
     const {
@@ -92,9 +92,9 @@ export const passengerSignup = async (req, res, next) => {
         };
 
         try {
-            await verifyPassenger(passengerDetails);
+            await verifyUser(passengerDetails);
         } catch (error) {
-            throw new InternalServerError(error.message);
+            return next(new InternalServerError("Error sending verification email"));
         }
 
         res
