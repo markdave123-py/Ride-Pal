@@ -2,13 +2,11 @@ import cloudinary  from "../../../core/config/cloudinary.js"
 import User from "../../model/user.js";
 import Vehicle from "../../model/vehicle.js";
 import Auth from "../../../auth/model/auth.model.js";
-import { ConflictError } from "../../../core/errors/conflictError.js";
-import { InternalServerError } from "../../../core/errors/internalServerError.js";
-import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 import { hashPassword } from "../../../core/utils/bcrypt.js";
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { sanitizeUser } from "../../../core/utils/sanitize.js";
 import { verifyUser } from "../../../core/utils/mailsender.js";
+// import { VehicleService } from "../services/vehicle.service.js";
 
 export const signUpDriver = async (req, res, next) => {
   const {
@@ -51,20 +49,20 @@ export const signUpDriver = async (req, res, next) => {
 
     for (const [field, value] of Object.entries(requiredFields)) {
       if (!value) {
-        throw new BadRequestError(`${field} is required`);
+        return next(new BadRequestError(`${field} is required`));
       }
     }
 
     // Check if a user with the given email already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      throw new ConflictError("User with this email already exists");
+      return next(new ConflictError("User with this email already exists"));
     }
 
     // Check if a vehicle with the given plate number already exists
     const existingVehicle = await Vehicle.findOne({ where: { plateNumber } });
     if (existingVehicle) {
-      throw new ConflictError("Vehicle with this plate number already exists");
+      return next(new ConflictError("Vehicle with this plate number already exists"));
     }
 
     // Upload workID to Cloudinary
@@ -75,7 +73,7 @@ export const signUpDriver = async (req, res, next) => {
       });
       workIDUrl = result.secure_url;
     } else {
-      throw new BadRequestError("workID image is required");
+      return next(new BadRequestError("workID image is required"));
     }
 
     // Hash the password
@@ -105,7 +103,9 @@ export const signUpDriver = async (req, res, next) => {
       ownerId: user.id,
     });
 
-    Auth.create({
+    // const vehicle = await VehicleService.createVehicle()
+
+    await Auth.create({
       userId: user.id,
       email,
     });
