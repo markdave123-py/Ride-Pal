@@ -6,7 +6,6 @@ import { config } from "./core/config/env.js";
 
 
 
-
 initializeDbConnection().then(startApp).catch(gracefullyShutdown);
 
 // Process-wide error handling for uncaught exceptions

@@ -36,4 +36,7 @@ export const config = Object.freeze({
     apiKey: process.env.CLOUDINARY_API_KEY,
     apiSecret: process.env.CLOUDINARY_API_SECRET,
   },
+  mapbox: {
+    apiKey: process.env.MAPBOX_API_KEY,
+  },
 });

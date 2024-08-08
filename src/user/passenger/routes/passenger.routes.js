@@ -1,7 +1,13 @@
-import { Router} from "express";
+import { Router } from "express";
 import { upload } from "../../../core/middlewares/multer.js";
 import { validateSignup } from "../validator/signup.validator.js";
 import { passengerSignup } from "../controller/signup.js";
+import { validateSchema } from "../../../core/utils/validateSchema.js";
+import { selectRouteSchema } from "../../../routing/validators/selectRoute.validator.js";
+import { selectRoute } from "../../../routing/controllers/select-route.js";
+import { joinRide } from "../../../routing/controllers/joinRide.js";
+import { validateJoinRide } from "../../../routing/validators/joinRide.validator.js";
+import { authGuard } from "../../../auth/authGuard/currentUser.js";
 
 const passengerRouter = Router();
 
@@ -12,5 +18,19 @@ passengerRouter.post(
   validateSignup,
   passengerSignup
 );
+
+passengerRouter.post(
+  "/select-routes",
+  authGuard.guard,
+  validateSchema(selectRouteSchema),
+  selectRoute
+);
+
+passengerRouter.put(
+  "/join-ride",
+  authGuard.guard,
+  validateJoinRide,
+  joinRide
+)
 
 export default passengerRouter;

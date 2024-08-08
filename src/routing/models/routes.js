@@ -1,5 +1,7 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelizeConn } from "../../core/config/database";
+import { sequelizeConn } from "../../core/config/database.js";
+import User from "../../user/model/user.js";
+import Ride from "./ride.js";
 
 class Route extends Model {}
 
@@ -11,20 +13,29 @@ Route.init(
       primaryKey: true,
     },
     startPoint: {
-      type: DataTypes.GEOMETRY("POINT"),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     destination: {
-      type: DataTypes.GEOMETRY("POINT"),
+      type: DataTypes.STRING,
       allowNull: false,
     },
     driverId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "Drivers", // Name of the related model
+        model: User, // Name of the related model
         key: "id", // Key in the related model
       },
+    },
+    rideId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: Ride,
+        key: "id"
+      } 
+
     },
     publishedAt: {
       type: DataTypes.DATE,
@@ -32,13 +43,13 @@ Route.init(
       defaultValue: DataTypes.NOW,
     },
     busstops: {
-      type: DataTypes.ARRAY(DataTypes.GEOMETRY("POINT")),
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
   },
   {
     sequelize: sequelizeConn,
-    modelName: "Route",
+    modelName: "route",
     tableName: "routes",
     timestamps: true,
     createdAt: "createdAt",
