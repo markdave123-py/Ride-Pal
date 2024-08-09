@@ -7,7 +7,12 @@ import { validateGetVehicle } from "../validator/getVehicle.validator.js";
 
 const driverRouter = Router();
 
-driverRouter.post("/signup", validateSignup, upload.single("workID"), signUpDriver);
+driverRouter.post(
+  "/signup",
+  upload.single("workID"),
+  validateSignup,
+ signUpDriver
+)
 
 driverRouter.post("get-vechile", validateGetVehicle, getVehicle)
 
