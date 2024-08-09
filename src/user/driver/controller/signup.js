@@ -6,6 +6,9 @@ import { hashPassword } from "../../../core/utils/bcrypt.js";
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { sanitizeUser } from "../../../core/utils/sanitize.js";
 import { verifyUser } from "../../../core/utils/mailsender.js";
+import { InternalServerError } from "../../../core/errors/internalServerError.js";
+import { ConflictError } from "../../../core/errors/conflictError.js";
+import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 // import { VehicleService } from "../services/vehicle.service.js";
 
 export const signUpDriver = async (req, res, next) => {
