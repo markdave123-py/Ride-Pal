@@ -50,9 +50,11 @@ export const publishRoutes = async (req, res, next) => {
     const vehicle = await VehicleService.getVehicleById(vehicleId);
 
 
-    if (!vehicle || vehicle.ownerId !== currUser.id) {
+    if (!vehicle) {
       return next(new BadRequestError("Invalid vehicle id"));
     }
+
+    if(vehicle.ownerId !== currUser.id) return next(new ForbiddenError("The provided vehicle does not belogn to you!!"))
 
     if (seatAvailable > vehicle.seatNumber) {
       return next(
@@ -65,7 +67,7 @@ export const publishRoutes = async (req, res, next) => {
     if ((await RideService.countRide()) > 0) {
       const rideEnded = await RideService.LastRideEnded(currUser.id);
 
-      if (rideEnded === "none") return next(new RouteNotFoundError());
+      if (rideEnded === "none") return next(new RouteNotFoundError("Ride not found!!"));
 
       if (!rideEnded) {
         return next(

@@ -1,4 +1,4 @@
-import { logger } from "../loggers";
+import { logger } from "../loggers/logger";
 
 type RetryOptions = {
   maxRetries?: number;
