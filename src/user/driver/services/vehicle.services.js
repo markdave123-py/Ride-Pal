@@ -9,7 +9,7 @@ export class VehicleService {
 
     static async getVehicleById(vehicleId) {
         const vehicle = await Vehicle.findByPk(vehicleId);
-        // console.log(vehicle)
+        if (!vehicle) return null
         return {
             plateNumber: vehicle.plateNumber,
             seatNumber: vehicle.seatNumber,
