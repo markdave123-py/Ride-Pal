@@ -11,6 +11,8 @@ import { HttpStatus } from "../../core/utils/statuscodes.js";
 import { VehicleService } from "../../user/driver/services/vehicle.services.js";
 import { RideService } from "../services/ride.service.js";
 import { ConflictError } from "../../core/errors/conflictError.js";
+import { RouteNotFoundError } from "../../core/errors/notFoundError.js"
+// import { }
 
 export const publishRoutes = async (req, res, next) => {
   const currUser = req.user;
@@ -67,7 +69,7 @@ export const publishRoutes = async (req, res, next) => {
     if ((await RideService.countRide()) > 0) {
       const rideEnded = await RideService.LastRideEnded(currUser.id);
 
-      if (rideEnded === "none") return next(new RouteNotFoundError("Ride not found!!"));
+      // if (rideEnded === "none") return next(new RouteNotFoundError("Ride not found!!"));
 
       if (!rideEnded) {
         return next(
