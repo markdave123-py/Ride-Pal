@@ -10,6 +10,7 @@ import User from "../../user/model/user.js";
 import { getTokens } from "../services/token.js";
 import { HttpStatus } from "../../core/utils/statuscodes.js";
 import Admin from "../../user/model/admin.js";
+import { VehicleService } from "../../user/driver/services/vehicle.services.js";
 // Constructor replacement for SignInService
 const refreshTokenExpTime = config.auth.refreshTokenExpTime;
 
@@ -39,7 +40,7 @@ async function signIn(req, res, next) {
         userType = "admin";
       }
     }
-    
+
     if (!user) {
       logger.error(AppMessages.FAILURE.INVALID_CREDENTIALS);
       return res.json({
@@ -78,6 +79,8 @@ async function signIn(req, res, next) {
       { where: { userId: user.id } }
     );
 
+    const vechile = await VehicleService.getVehicleByOwnerId(user.id);
+
     logger.info(AppMessages.SUCCESS.LOGIN);
 
     return res.json({
@@ -87,6 +90,7 @@ async function signIn(req, res, next) {
         accessToken,
         refreshToken,
         user: sanitizeUser(user),
+        vechile: vechile
       },
     });
   } catch (error) {
