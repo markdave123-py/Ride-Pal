@@ -4,6 +4,11 @@ import { upload } from "../../../core/middlewares/multer.js";
 import { validateSignup } from "../validator/signup.validator.js";
 import { getVehicle } from "../controller/getVehicle.js";
 import { validateGetVehicle } from "../validator/getVehicle.validator.js";
+import { validateStartRide } from "../../../routing/validators/startRide.validator.js";
+import { startRide } from "../../../routing/controllers/startRide.js";
+import { endRide } from "../../../routing/controllers/endRide.js";
+import { cancelRide } from "../../../routing/controllers/cancelRide.js";
+import { authGuard } from "../../../auth/authGuard/currentUser.js";
 
 const driverRouter = Router();
 
@@ -11,10 +16,16 @@ driverRouter.post(
   "/signup",
   upload.single("workID"),
   validateSignup,
- signUpDriver
-)
+  signUpDriver
+);
 
-driverRouter.post("get-vechile", validateGetVehicle, getVehicle)
+driverRouter.post("get-vechile", validateGetVehicle, getVehicle);
+
+driverRouter.post("/start-ride", authGuard.guard, validateStartRide, startRide);
+
+driverRouter.post("/cancel-ride",authGuard.guard, validateStartRide, cancelRide)
+
+driverRouter.post("end-ride", authGuard.guard, validateStartRide, endRide);
 
 
 export default driverRouter;
