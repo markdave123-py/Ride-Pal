@@ -24,23 +24,27 @@ export class RideService {
     // });
 
     const currentTime = new Date();
+    const stops = [];
 
     const Routes = await Promise.all(
       routes.map(async (route) => {
         const busStops = route.busstops;
+        busStops.unshift(route.startPoint);
+        busStops.push(route.destination);
         const sourceIndex = busStops.indexOf(source);
         const destinationIndex = busStops.indexOf(destination);
         if (sourceIndex !== -1 && destinationIndex !== -1) {
           if (
-            sourceIndex < destinationIndex ||
-            source == route.startPoint ||
-            destination == route.destination
+            sourceIndex < destinationIndex &&
+            route.busstops.includes(source) &&
+            route.busstops.includes(destination)
           ) {
             const ride = await this.getRideByRouteId(route.id);
             const rideStartTime = new Date(ride.startTime);
             if (currentTime < rideStartTime) {
               return route;
             }
+            // return route;
           }
         }
         return null;
@@ -90,14 +94,12 @@ export class RideService {
     };
   }
 
-    static async getRide(id) {
+  static async getRide(id) {
+    const ride = await Ride.findByPk(id);
 
-        const ride = await Ride.findByPk(id);
+    if (!ride) return false;
 
-        if (!ride) return false;
-
-        return ride
-
+    return ride;
   }
 
   static async getRideByRouteId(routeId) {
@@ -123,24 +125,21 @@ export class RideService {
     return ride;
   }
 
-    static async countRide() {
-        const count = await Ride.count();
-        return count
-    }
+  static async countRide() {
+    const count = await Ride.count();
+    return count;
+  }
 
-    static async LastRideEnded(driverId) {
-        const ride = await Ride.findOne({
-            where: {
-                driverId
-            },
-            order: [
-                ['createdAt', 'DESC']
-            ]
-        });
+  static async LastRideEnded(driverId) {
+    const ride = await Ride.findOne({
+      where: {
+        driverId,
+      },
+      order: [["createdAt", "DESC"]],
+    });
 
-        if(!ride) return "none"
+    if (!ride) return "none";
 
-        return ride.endTime !== null;
-    }
-
+    return ride.endTime !== null;
+  }
 }

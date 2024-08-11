@@ -7,7 +7,10 @@ import { logger } from "../../core/loggers/logger.js";
 import { HttpStatus } from "../../core/utils/statuscodes.js";
 
 export const selectRoute = async (req, res, next) => {
-  const { source, destination } = req.body;
+  let { source, destination } = req.body;
+
+  source = source.toLowerCase();
+  destination = destination.toLowerCase();
 
   try {
 

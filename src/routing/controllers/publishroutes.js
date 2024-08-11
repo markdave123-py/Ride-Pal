@@ -49,13 +49,16 @@ export const publishRoutes = async (req, res, next) => {
       }
     }
 
+    // console.log(vehicleId)
+
     const vehicle = await VehicleService.getVehicleById(vehicleId);
+    // console.log(vehicle)
 
 
     if (!vehicle) {
       return next(new BadRequestError("Invalid vehicle id"));
     }
-
+    console.log(currUser.id, vehicle.ownerId)
     if(vehicle.ownerId !== currUser.id) return next(new ForbiddenError("The provided vehicle does not belogn to you!!"))
 
     if (seatAvailable > vehicle.seatNumber) {
@@ -88,14 +91,14 @@ export const publishRoutes = async (req, res, next) => {
     // const stops = await getPlacesAlongRoute(startCoord, destCoord);
 
     const route = await Route.create({
-      startPoint: startPoint,
-      destination: destination,
+      startPoint: startPoint.toLowerCase(),
+      destination: destination.toLowerCase(),
       driverId: currUser.id,
-      busstops: routes,
+      busstops: routes.map((str) => str.toLowerCase()),
     });
 
     const ride = await Ride.create({
-      startTime: new Date(route.publishedAt.getTime() + 1000 * 60 * 2),
+      startTime: new Date(route.publishedAt.getTime() + 1000 * 60 * 60 * 24),
       numberOfPassengers: 0,
       routeId: route.id,
       seatAvailable,
