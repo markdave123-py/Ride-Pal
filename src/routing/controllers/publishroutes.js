@@ -98,7 +98,7 @@ export const publishRoutes = async (req, res, next) => {
     });
 
     const ride = await Ride.create({
-      startTime: new Date(route.publishedAt.getTime() + 1000 * 60 * 60 * 24),
+      startTime: new Date(route.publishedAt.getTime() + 1000 * 60 * 0.5),
       numberOfPassengers: 0,
       routeId: route.id,
       seatAvailable,

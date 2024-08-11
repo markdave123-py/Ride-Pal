@@ -52,12 +52,12 @@ Ride.init(
     },
     status: {
       type: DataTypes.ENUM,
-      values: ["completed", "ongoing", "cancelled"],
+      values: ["pending","completed", "ongoing", "cancelled"],
       allowNull: false,
-      defaultValue: "ongoing",
+      defaultValue: "pending",
       validate: {
         isIn: {
-          args: [["completed", "ongoing", "cancelled"]],
+          args: [["pending","completed", "ongoing", "cancelled"]],
           msg: "Status must ne one of the following: completed, ongoing, cancelled"
         },
       },

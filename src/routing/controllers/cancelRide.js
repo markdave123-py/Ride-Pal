@@ -2,43 +2,44 @@ import { RideService } from "../services/ride.service.js";
 import { InternalServerError } from "../../core/errors/internalServerError.js";
 import { ApiError } from "../../core/errors/apiErrors.js";
 import { ForbiddenError } from "../../core/errors/forbiddenError.js";
-import Ride from "../models/ride.js";
 import { HttpStatus } from "../../core/utils/statuscodes.js";
 import { BadRequestError } from "../../core/errors/BadRequestError.js";
 import { logger } from "../../core/loggers/logger.js";
 
-export const endRide = async (req, res, next) => {
+export const cancelRide = async (req, res, next) => {
   const { rideId } = req.body;
 
   try {
     const currUser = req.user;
 
     if (currUser.type !== "driver") {
-      return next(new ForbiddenError("Only Drivers can access this route!!"));
+      return next(
+        new ForbiddenError("Only passengers can access this route!!")
+      );
     }
 
     const ride = await RideService.getRide(rideId);
 
-    if (!ride) return next(new BadRequestError("Invalid rideId"));
+    if (!ride) {
+      return next(new BadRequestError("No routes found"));
+    }
 
     if (ride.driverId !== currUser.id)
-      return next(new ForbiddenError("This is not your ride!!"));
+        return next(new ForbiddenError("This ride wasn't created by you!!"));
 
-    ride.endTime = new Date();
-    ride.status = "completed"
+    if (ride.status !== "ongoing") return next(new ForbiddenError("you can't cancel a ride that is not ongoing!!"))
+
+    ride.status = "cancelled";
 
     ride.save();
 
-      const passengerCarried = ride.passengers.length;
-
-      logger.info("The ride have successfully ended!!");
-
-      return res.status(HttpStatus.OK).json({
-          message: "ride ended successfully",
-          passengerCarried: passengerCarried
-      })
+    logger.info(`This ride with id ${rideId} has successfully started!!`);
+    return res.status(HttpStatus.OK).json({
+      message: "This ride has successfully started!!",
+      joinedRide,
+    });
   } catch (error) {
-    return next(
+    next(
       error instanceof ApiError ? error : new InternalServerError(error.message)
     );
   }

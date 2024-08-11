@@ -6,7 +6,9 @@ import { isBeforeStartTime } from "../../core/utils/compareTime.js";
 
 export class RideService {
   static async getAllRoutes(source, destination) {
-    const routes = await Route.findAll();
+    const routes = await Route.findAll({where: {
+      status: "pending"
+    }});
 
     // const filteredRoutes = routes.filter(async (route) => {
     //   const busStops = route.busstops;
@@ -24,7 +26,6 @@ export class RideService {
     // });
 
     const currentTime = new Date();
-    const stops = [];
 
     const Routes = await Promise.all(
       routes.map(async (route) => {
@@ -44,7 +45,6 @@ export class RideService {
             if (currentTime < rideStartTime) {
               return route;
             }
-            // return route;
           }
         }
         return null;
@@ -91,6 +91,7 @@ export class RideService {
       vehicle: await VehicleService.getVehicleById(ride.vehicleId),
       seatAvailable: ride.seatAvailable,
       instruction: ride.instruction,
+      status: ride.status
     };
   }
 

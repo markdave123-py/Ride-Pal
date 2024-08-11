@@ -4,6 +4,7 @@ import { ApiError } from "../../core/errors/apiErrors.js";
 import { ForbiddenError } from "../../core/errors/forbiddenError.js";
 import { HttpStatus } from "../../core/utils/statuscodes.js";
 import { BadRequestError } from "../../core/errors/BadRequestError.js";
+import { ConflictError } from "../../core/errors/conflictError.js";
 import { logger } from "../../core/loggers/logger.js";
 
 export const joinRide = async (req, res, next) => {
@@ -24,6 +25,8 @@ export const joinRide = async (req, res, next) => {
       if (!ride) {
         return next(new BadRequestError("No routes found"));
       }
+
+    if(ride.status !==  "pending") return next(new ConflictError("You can only join rides that are pending/ jot started!!"))
 
       const joinedRide = await RideService.joinRide(ride, currUser.id);
 
