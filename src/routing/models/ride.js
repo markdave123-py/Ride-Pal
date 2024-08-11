@@ -20,7 +20,6 @@ Ride.init(
     seatAvailable: {
       type: DataTypes.INTEGER,
       allowNull: false,
-
     },
     vehicleId: {
       type: DataTypes.UUID,
@@ -38,8 +37,8 @@ Ride.init(
       type: DataTypes.ARRAY(DataTypes.UUID),
       allowNull: true,
       defaultValue: [],
-        },
-    instruction:{
+    },
+    instruction: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
@@ -49,8 +48,20 @@ Ride.init(
     },
     driverId: {
       type: DataTypes.UUID,
-      allowNull: false
-    }
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      values: ["completed", "ongoing", "cancelled"],
+      allowNull: false,
+      defaultValue: "ongoing",
+      validate: {
+        isIn: {
+          args: [["completed", "ongoing", "cancelled"]],
+          msg: "Status must ne one of the following: completed, ongoing, cancelled"
+        },
+      },
+    },
   },
   {
     sequelize: sequelizeConn,
