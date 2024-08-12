@@ -7,6 +7,6 @@ const verifyRouter = Router();
 
 
 // Route for verifying a user
-verifyRouter.post("/verify-user",authGuard.guard, verifyUser);
+verifyRouter.get("/verify-user",authGuard.guard, verifyUser);
 
 export default verifyRouter;

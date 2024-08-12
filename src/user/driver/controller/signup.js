@@ -9,6 +9,7 @@ import { verifyUser } from "../../../core/utils/mailsender.js";
 import { InternalServerError } from "../../../core/errors/internalServerError.js";
 import { ConflictError } from "../../../core/errors/conflictError.js";
 import { BadRequestError } from "../../../core/errors/BadRequestError.js";
+import { jwtSign } from "../../../core/utils/jwt.js";
 // import { VehicleService } from "../services/vehicle.service.js";
 
 export const signUpDriver = async (req, res, next) => {
@@ -113,6 +114,8 @@ export const signUpDriver = async (req, res, next) => {
       email,
     });
 
+    const token = jwtSign(user.id)
+
     const sanitizedUser = sanitizeUser(user);
 
     const driverDetails = {
@@ -121,7 +124,7 @@ export const signUpDriver = async (req, res, next) => {
     };
 
     try {
-      await verifyUser(driverDetails);
+      await verifyUser(driverDetails, token);
     } catch (error) {
       return next(new InternalServerError(error.message));
 
