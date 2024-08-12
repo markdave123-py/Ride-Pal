@@ -6,27 +6,33 @@ import { ForbiddenError } from "../../../core/errors/forbiddenError.js"
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { logger } from "../../../core/loggers/logger.js";
 import { notifyUser } from "../../../core/utils/mailsender.js";
+import { decode } from "../../../core/utils/jwt.js";
+
 
 export const verifyUser = async (req, res, next) => {
 
-  const curruser = req.user;
+  // const curruser = req.user;
 
-  if (curruser.type !== "admin") {
-    return next(
-      new ForbiddenError("You are not authorized to perform this action")
-    );
-  }
-  const { userId } = req.body;
+  // if (curruser.type !== "admin") {
+  //   return next(
+  //     new ForbiddenError("You are not authorized to perform this action")
+  //   );
+  // }
+  const { token } = req.query;
 
   try {
-    if (!userId) {
-      return next( new BadRequestError("userId required"));
-    }
 
-    const user = await User.findOne({ where: { id: userId } });
+    const decoded = decode(token)
+
+    const user = await User.findOne({ where: { id: decoded.userId } });
+
 
     if (!user) {
       return next( new RouteNotFoundError("User not found"));
+    }
+
+    if (user.is_verified) {
+      return res.status(400).json({ message: "User is already verified" });
     }
 
     user.is_verified = true;
