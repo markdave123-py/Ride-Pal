@@ -24,7 +24,7 @@ export const verifyUser = async (req, res, next) => {
 
     const decoded = decode(token)
 
-    const user = await User.findOne({ where: { id: decoded.userId } });
+    const user = await User.findOne({ where: { id: decoded.userid } });
 
 
     if (!user) {
@@ -41,7 +41,7 @@ export const verifyUser = async (req, res, next) => {
 
     await notifyUser(user.email);
 
-    logger.info(`User with id ${userId} verified successfully`);
+    logger.info(`User with email ${user.email} verified successfully`);
 
     res.status(200).json({ message: "User verified successfully", user });
   } catch (error) {
