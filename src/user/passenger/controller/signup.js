@@ -8,6 +8,7 @@ import { hashPassword } from "../../../core/utils/bcrypt.js";
 import { ApiError } from "../../../core/errors/apiErrors.js";
 import { sanitizeUser } from "../../../core/utils/sanitize.js";
 import { verifyUser } from "../../../core/utils/mailsender.js";
+import { jwtSign } from "../../../core/utils/jwt.js";
 
 export const passengerSignup = async (req, res, next) => {
     const {
@@ -85,6 +86,8 @@ export const passengerSignup = async (req, res, next) => {
             email,
         });
 
+        const token = jwtSign(user.id)
+
         const sanitizedUser = sanitizeUser(user);
 
         const passengerDetails = {
@@ -92,7 +95,7 @@ export const passengerSignup = async (req, res, next) => {
         };
 
         try {
-            await verifyUser(passengerDetails);
+            await verifyUser(passengerDetails, token);
         } catch (error) {
             return next(new InternalServerError("Error sending verification email"));
         }
