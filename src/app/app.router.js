@@ -5,6 +5,7 @@ import passengerRouter from "../user/passenger/routes/passenger.routes.js"
 import verifyRouter from "../user/admin/routes/verify.js";
 import { authRouter } from "../auth/routes/signIn.js";
 import routeRouter from "../routing/routes/publishRoutes.routes.js";
+import ratingRouter from "../rating/routes/rating.routes.js";
 
 export const appRouter = Router();
 
@@ -13,6 +14,7 @@ appRouter.use("/passenger", passengerRouter);
 appRouter.use("/admin", verifyRouter);
 appRouter.use("/auth", authRouter);
 appRouter.use("/route", routeRouter);
+appRouter.use("/rating", ratingRouter);
 
 appRouter.get("/health", (_, res) => {
   res.status(HttpStatus.OK).json({

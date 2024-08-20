@@ -25,7 +25,7 @@ driverRouter.post("/start-ride", authGuard.guard, validateStartRide, startRide);
 
 driverRouter.post("/cancel-ride",authGuard.guard, validateStartRide, cancelRide)
 
-driverRouter.post("end-ride", authGuard.guard, validateStartRide, endRide);
+driverRouter.post("/end-ride", authGuard.guard, validateStartRide, endRide);
 
 
 export default driverRouter;

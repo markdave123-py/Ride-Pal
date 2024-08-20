@@ -6,9 +6,11 @@ import { isBeforeStartTime } from "../../core/utils/compareTime.js";
 
 export class RideService {
   static async getAllRoutes(source, destination) {
-    const routes = await Route.findAll({where: {
-      status: "pending"
-    }});
+    const routes = await Route.findAll({
+      where: {
+        status: "pending",
+      },
+    });
 
     // const filteredRoutes = routes.filter(async (route) => {
     //   const busStops = route.busstops;
@@ -91,7 +93,7 @@ export class RideService {
       vehicle: await VehicleService.getVehicleById(ride.vehicleId),
       seatAvailable: ride.seatAvailable,
       instruction: ride.instruction,
-      status: ride.status
+      status: ride.status,
     };
   }
 
@@ -113,17 +115,56 @@ export class RideService {
     return ride;
   }
 
+  // static async joinRide(ride, passengerId) {
+  //   if (ride.seatAvailable <= 0) {
+  //     return false;
+  //   }
+
+  //   let passengers = ride.passengers;
+
+  //   if (passengers.includes(passengerId)) {
+  //     return false;
+  //   }
+
+  //   passengers.push(passengerId);
+  //   console.log(passengers)
+
+  //    try {
+  //      await ride.update({ passengers, seatAvailable: ride.seatAvailable - 1 });
+  //      return ride;
+  //    } catch (error) {
+  //      console.error("Error updating ride:", error);
+  //      return false
+  //    }
+  // }
+
   static async joinRide(ride, passengerId) {
     if (ride.seatAvailable <= 0) {
       return false;
     }
 
-    ride.passengers.push(passengerId);
-    ride.seatAvailable -= 1;
+    let passengers = ride.passengers || [];
 
-    await ride.save();
+    if (passengers.includes(passengerId)) {
+      return false;
+    }
 
-    return ride;
+    passengers.push(passengerId);
+    console.log(passengers);
+
+    // Manually mark the passengers field as changed
+    ride.set("passengers", passengers);
+    ride.set("seatAvailable", ride.seatAvailable - 1);
+    ride.changed("passengers", true);
+    ride.changed("seatAvailable", true);
+
+    try {
+      await ride.save(); // Try using save instead of update
+      return ride;
+    } catch (error) {
+      console.error("Error updating ride:", error);
+      return false;
+    }
   }
 
   static async countRide() {
