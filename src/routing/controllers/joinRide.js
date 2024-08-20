@@ -26,7 +26,7 @@ export const joinRide = async (req, res, next) => {
         return next(new BadRequestError("No routes found"));
       }
 
-    if(ride.status !==  "pending") return next(new ConflictError("You can only join rides that are pending/ jot started!!"))
+    // if(ride.status !==  "pending") return next(new ConflictError("You can only join rides that are pending/ jot started!!"))
 
       const joinedRide = await RideService.joinRide(ride, currUser.id);
 

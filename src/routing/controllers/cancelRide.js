@@ -14,7 +14,7 @@ export const cancelRide = async (req, res, next) => {
 
     if (currUser.type !== "driver") {
       return next(
-        new ForbiddenError("Only passengers can access this route!!")
+        new ForbiddenError("Only Drivers can access this route!!")
       );
     }
 
@@ -33,10 +33,9 @@ export const cancelRide = async (req, res, next) => {
 
     ride.save();
 
-    logger.info(`This ride with id ${rideId} has successfully started!!`);
+    logger.info(`This ride with id ${rideId} has successfully cancelled!!`);
     return res.status(HttpStatus.OK).json({
-      message: "This ride has successfully started!!",
-      joinedRide,
+      message: "This ride has successfully cancelled!!"
     });
   } catch (error) {
     next(

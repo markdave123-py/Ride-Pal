@@ -12,4 +12,10 @@ export class UserService {
           company: driver.companyName,
     }
   }
+
+  static async getUserById(userId) {
+    const user = await User.findByPk(userId);
+
+    return user;
+  }
 }

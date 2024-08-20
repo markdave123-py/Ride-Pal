@@ -1,7 +1,5 @@
 import { VehicleService } from "../services/vehicle.services.js";
-import { ConflictError } from "../../../core/errors/conflictError.js";
 import { InternalServerError } from "../../../core/errors/internalServerError.js";
-import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 import { HttpStatus } from "../../../core/utils/statuscodes.js";
 import { ApiError } from "../../../core/errors/apiErrors.js";
 
