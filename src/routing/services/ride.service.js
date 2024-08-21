@@ -5,11 +5,12 @@ import { UserService } from "../../user/driver/services/driver.services.js";
 import { isBeforeStartTime } from "../../core/utils/compareTime.js";
 
 export class RideService {
+
   static async getAllRoutes(source, destination) {
     const routes = await Route.findAll({
-      where: {
-        status: "pending",
-      },
+      // where: {
+      //   status: "pending",
+      // },
     });
 
     // const filteredRoutes = routes.filter(async (route) => {
@@ -44,7 +45,8 @@ export class RideService {
           ) {
             const ride = await this.getRideByRouteId(route.id);
             const rideStartTime = new Date(ride.startTime);
-            if (currentTime < rideStartTime) {
+            // return route
+            if (currentTime < rideStartTime && ride.status == "pending") {
               return route;
             }
           }
@@ -183,5 +185,15 @@ export class RideService {
     if (!ride) return "none";
 
     return ride.endTime !== null;
+  }
+
+  static async driverOngoingRide(driverId) {
+    const ride = Ride.findOne({
+      where: {
+        driverId: driverId, status: "ongoing"
+      }
+    })
+
+    return ride
   }
 }
