@@ -83,7 +83,7 @@ const __dirname = path.dirname(__filename);
 
 
 export const verifyUser = async (details, token) => {
-  const link = `https://ride-pal-1.onrender.com/api/admin/verify-user?token=${token}`;
+  const link = `https://ride-pal.onrender.com/api/admin/verify-user?token=${token}`;
 
   // Read the template file
   const templatePath = path.join(__dirname, "emailTemplate.hbs");
