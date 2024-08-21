@@ -13,13 +13,13 @@ export const selectRoute = async (req, res, next) => {
   destination = destination.toLowerCase();
 
   try {
-
     const currUser = req.user;
 
     if (currUser.type !== "passenger") {
       return next(
         new ForbiddenError("Only passengers can access this route!!")
-    ) }
+      );
+    }
 
     const routes = await RideService.getAllRoutes(source, destination);
 

@@ -9,6 +9,7 @@ import { startRide } from "../../../routing/controllers/startRide.js";
 import { endRide } from "../../../routing/controllers/endRide.js";
 import { cancelRide } from "../../../routing/controllers/cancelRide.js";
 import { authGuard } from "../../../auth/authGuard/currentUser.js";
+import { ongoingRide } from "../../../routing/controllers/driver-current-ride.js";
 
 const driverRouter = Router();
 
@@ -19,13 +20,15 @@ driverRouter.post(
   signUpDriver
 );
 
-driverRouter.post("get-vechile", validateGetVehicle, getVehicle);
+driverRouter.post("/get-vechile", validateGetVehicle, getVehicle);
 
 driverRouter.post("/start-ride", authGuard.guard, validateStartRide, startRide);
 
-driverRouter.post("/cancel-ride",authGuard.guard, validateStartRide, cancelRide)
+driverRouter.post("/cancel-ride", authGuard.guard, validateStartRide, cancelRide);
 
 driverRouter.post("/end-ride", authGuard.guard, validateStartRide, endRide);
+
+driverRouter.get("/ongoing-ride", authGuard.guard, ongoingRide);
 
 
 export default driverRouter;
