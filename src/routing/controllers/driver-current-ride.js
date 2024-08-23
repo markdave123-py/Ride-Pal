@@ -30,4 +30,33 @@ export const ongoingRide = async (req, res, next) => {
       error instanceof ApiError ? error : new InternalServerError(error.message)
     );
   }
-};
+}
+
+
+export const pendingRide = async (req, res, next) => {
+
+  try {
+
+    const currUser = req.user;
+
+    if (currUser.type !== "driver") {
+      return next(new ForbiddenError("Only Drivers can access this route!!"));
+    }
+
+    const ride = await RideService.getPendingRide(currUser.id);
+
+    if (!ride) return next(new BadRequestError("You dont have any pending ride"));
+
+    logger.info("Ride successfully retrived!!");
+
+    return res.status(HttpStatus.OK).json({
+      message: "Ride successfully retrived",
+      ride
+    });
+
+  } catch (error) {
+
+    return next(error instanceof ApiError ? error : new InternalServerError(error.message))
+
+  }
+}
