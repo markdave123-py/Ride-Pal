@@ -196,4 +196,16 @@ export class RideService {
 
     return ride
   }
+
+
+  static async getPendingRide(driverId) {
+    const rides = await Ride.findOne({
+      where: {
+        driverId,
+        status: "pending"
+      }
+    })
+
+    return rides
+  }
 }
