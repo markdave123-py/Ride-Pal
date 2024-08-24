@@ -9,6 +9,8 @@ import { ApiError } from "../../../core/errors/apiErrors.js";
 import { sanitizeUser } from "../../../core/utils/sanitize.js";
 import { verifyUser } from "../../../core/utils/mailsender.js";
 import { jwtSign } from "../../../core/utils/jwt.js";
+import { sendEmailVerification } from "../../../core/utils/mailsender.js";
+import { generateVerificationToken } from "../../../auth/services/encryptor.js";
 
 export const passengerSignup = async (req, res, next) => {
     const {
@@ -66,25 +68,32 @@ export const passengerSignup = async (req, res, next) => {
         // Hash the password
         const hashedPassword = await hashPassword(password);
 
+        const verificationToken = generateVerificationToken();
+
         // Create the user
         const user = await User.create({
-            type: "passenger",
-            workAddress,
-            workEmail,
-            email,
-            workID: workIDUrl,
-            firstName,
-            password: hashedPassword,
-            lastName,
-            profession,
-            companyName,
-            is_verified: false,
+          type: "passenger",
+          workAddress,
+          workEmail,
+          email,
+          workID: workIDUrl,
+          firstName,
+          password: hashedPassword,
+          lastName,
+          profession,
+          companyName,
+          is_verified: false,
+          verificationToken,
         });
+
+
 
         Auth.create({
             userId: user.id,
             email,
         });
+
+        await sendEmailVerification(user);
 
         const token = jwtSign(user.id)
 
