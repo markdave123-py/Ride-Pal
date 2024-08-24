@@ -77,10 +77,8 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 export const verifyUser = async (details, token) => {
   const link = `https://ride-pal.onrender.com/api/admin/verify-user?token=${token}`;
@@ -120,6 +118,36 @@ export const verifyUser = async (details, token) => {
   try {
     await transporter.sendMail(mailOptions);
     console.log("Verification email sent to admin.");
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+  }
+};
+
+export const sendEmailVerification = async (user) => {
+  const verificationUrl = `https://ride-pal.onrender.com/api/admin/verify-email?token=${user.verificationToken}`;
+
+  const mailOptions = {
+    from: '"RidePal Admin" <no-reply@ridepal.com>',
+    to: user.email,
+    subject: "Verify your Email - RidePal",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+        <h2 style="color: #333;">Welcome to RidePal!</h2>
+        <p>Hi ${user.firstName || "there"},</p>
+        <p>Thank you for signing up with RidePal. To get started, please verify your email address by clicking the link below:</p>
+        <p style="text-align: center;">
+          <a href="${verificationUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
+        </p>
+        <p>If the button above doesn't work, copy and paste the following link into your web browser:</p>
+        <p><a href="${verificationUrl}">${verificationUrl}</a></p>
+        <p>If you did not sign up for a RidePal account, please disregard this email.</p>
+        <p>Best regards,<br/>The RidePal Team</p>
+      </div>
+    `,
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Verification email sent to user.");
   } catch (error) {
     console.error("Error sending verification email:", error);
   }

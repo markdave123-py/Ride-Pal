@@ -51,9 +51,17 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    email_verified: {
+      type: DataTypes.BOOLEAN,
+      default: false,
+    },
     is_verified: {
       type: DataTypes.BOOLEAN,
       default: false,
+    },
+    verificationToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
