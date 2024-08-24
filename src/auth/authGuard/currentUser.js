@@ -34,7 +34,7 @@ class AuthGuard {
         return res.status(HttpStatus.FORBIDDEN).json({
           code: HttpStatus.FORBIDDEN,
           message:
-            "You cannot access this endpoint until your email is verified by Admin!!.",
+            "You cannot access this endpoint until your email is verified by Admin, After verification login again.",
         });
       }
 
