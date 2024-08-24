@@ -43,7 +43,7 @@ export const verifyUser = async (req, res, next) => {
 
     logger.info(`User with email ${user.email} verified successfully`);
 
-    res.status(200).json({ message: "User verified successfully", user });
+    res.status(200).json({ message: "User verified successfully"});
   } catch (error) {
     return next(error instanceof ApiError ? error : new InternalServerError(error.message));
   }
