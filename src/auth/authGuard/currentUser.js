@@ -1,4 +1,3 @@
-
 import { HttpStatus } from "../../core/utils/statuscodes.js";
 import { UnAuthorizedError } from "../../core/errors/unAuthorizedError.js";
 import { ForbiddenError } from "../../core/errors/forbiddenError.js";
@@ -7,7 +6,6 @@ import { AppMessages } from "../../core/common/appmessages.js";
 import { extractTokenDetails } from "../services/token.js";
 
 class AuthGuard {
-
   async guard(req, res, next) {
     const authHeader = req.headers.authorization;
 
@@ -30,10 +28,16 @@ class AuthGuard {
     const { accessTokenSecret } = config.auth;
 
     try {
-      const user = await extractTokenDetails(
-        token,
-        accessTokenSecret
-      );
+      const user = await extractTokenDetails(token, accessTokenSecret);
+
+      if (!user.is_verified) {
+        return res.status(HttpStatus.FORBIDDEN).json({
+          code: HttpStatus.FORBIDDEN,
+          message:
+            "You cannot access this endpoint until your email is verified by Admin!!.",
+        });
+      }
+
       req.user = user;
       next();
     } catch (error) {

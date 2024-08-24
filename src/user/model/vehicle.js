@@ -22,6 +22,7 @@ Vehicle.init(
       references: {
         model: User,
         key: "id",
+        onDelete: "CASCADE",
       },
     },
     color: {

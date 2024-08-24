@@ -1,4 +1,4 @@
-import cloudinary  from "../../../core/config/cloudinary.js"
+import cloudinary from "../../../core/config/cloudinary.js";
 import User from "../../model/user.js";
 import Vehicle from "../../model/vehicle.js";
 import Auth from "../../../auth/model/auth.model.js";
@@ -10,6 +10,8 @@ import { InternalServerError } from "../../../core/errors/internalServerError.js
 import { ConflictError } from "../../../core/errors/conflictError.js";
 import { BadRequestError } from "../../../core/errors/BadRequestError.js";
 import { jwtSign } from "../../../core/utils/jwt.js";
+import { generateVerificationToken } from "../../../auth/services/encryptor.js";
+import { sendEmailVerification } from "../../../core/utils/mailsender.js";
 // import { VehicleService } from "../services/vehicle.service.js";
 
 export const signUpDriver = async (req, res, next) => {
@@ -66,7 +68,9 @@ export const signUpDriver = async (req, res, next) => {
     // Check if a vehicle with the given plate number already exists
     const existingVehicle = await Vehicle.findOne({ where: { plateNumber } });
     if (existingVehicle) {
-      return next(new ConflictError("Vehicle with this plate number already exists"));
+      return next(
+        new ConflictError("Vehicle with this plate number already exists")
+      );
     }
 
     // Upload workID to Cloudinary
@@ -81,7 +85,9 @@ export const signUpDriver = async (req, res, next) => {
     }
 
     // Hash the password
-    const hashedPassword = await hashPassword(password)
+    const hashedPassword = await hashPassword(password);
+
+    const verificationToken = generateVerificationToken();
 
     // Create the user
     const user = await User.create({
@@ -96,6 +102,7 @@ export const signUpDriver = async (req, res, next) => {
       profession,
       companyName,
       is_verified: false,
+      verificationToken
     });
 
     // Create the vehicle
@@ -114,7 +121,9 @@ export const signUpDriver = async (req, res, next) => {
       email,
     });
 
-    const token = jwtSign(user.id)
+    await sendEmailVerification(user);
+
+    const token = jwtSign(user.id);
 
     const sanitizedUser = sanitizeUser(user);
 
@@ -127,12 +136,15 @@ export const signUpDriver = async (req, res, next) => {
       await verifyUser(driverDetails, token);
     } catch (error) {
       return next(new InternalServerError(error.message));
-
     }
 
     res
       .status(201)
-      .json({ message: "Driver registered successfully", user: sanitizedUser, vehicle });
+      .json({
+        message: "Driver registered successfully",
+        user: sanitizedUser,
+        vehicle,
+      });
   } catch (error) {
     next(
       error instanceof ApiError ? error : new InternalServerError(error.message)

@@ -26,6 +26,7 @@ Route.init(
       references: {
         model: User, // Name of the related model
         key: "id", // Key in the related model
+        onDelete: "CASCADE",
       },
     },
     rideId: {
@@ -33,9 +34,8 @@ Route.init(
       allowNull: true,
       references: {
         model: Ride,
-        key: "id"
-      } 
-
+        key: "id",
+      },
     },
     publishedAt: {
       type: DataTypes.DATE,

@@ -12,4 +12,10 @@ const decrypt = (data) => {
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
-export { encrypt, decrypt };
+const generateVerificationToken = () => {
+  const randomBytes = CryptoJS.lib.WordArray.random(32);
+
+  return CryptoJS.enc.Base64.stringify(randomBytes);
+};
+
+export { encrypt, decrypt, generateVerificationToken };

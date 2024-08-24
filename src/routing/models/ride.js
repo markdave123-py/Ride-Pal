@@ -2,6 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import { sequelizeConn } from "../../core/config/database.js";
 import Route from "./routes.js";
 import Vehicle from "../../user/model/vehicle.js";
+import User from "../../user/model/user.js";
 
 class Ride extends Model {}
 
@@ -45,20 +46,26 @@ Ride.init(
     routeId: {
       type: DataTypes.UUID,
       allowNull: false,
+
     },
     driverId: {
       type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+        onDelete: "CASCADE",
+      },
     },
     status: {
       type: DataTypes.ENUM,
-      values: ["pending","completed", "ongoing", "cancelled"],
+      values: ["pending", "completed", "ongoing", "cancelled"],
       allowNull: false,
       defaultValue: "pending",
       validate: {
         isIn: {
-          args: [["pending","completed", "ongoing", "cancelled"]],
-          msg: "Status must ne one of the following: completed, ongoing, cancelled"
+          args: [["pending", "completed", "ongoing", "cancelled"]],
+          msg: "Status must ne one of the following: completed, ongoing, cancelled",
         },
       },
     },

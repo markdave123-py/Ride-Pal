@@ -48,7 +48,14 @@ async function signIn(req, res, next) {
         message: AppMessages.FAILURE.INVALID_CREDENTIALS,
       });
     }
-    // print(user)
+
+    if (!user.email_verified) {
+      logger.error(AppMessages.FAILURE.EMAIL_NOT_VERIFIED);
+      return res.json({
+        code: HttpStatus.BAD_REQUEST,
+        message: AppMessages.FAILURE.EMAIL_NOT_VERIFIED,
+      });
+    }
 
     const isPasswordValid = await comparePassword(password, user.password);
 
@@ -64,6 +71,7 @@ async function signIn(req, res, next) {
       id: user.id,
       email: user.email,
       type: userType,
+      is_verified: user.is_verified,
     });
 
     let expireAt = new Date();
