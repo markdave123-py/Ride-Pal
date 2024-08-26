@@ -10,3 +10,18 @@ export function sanitizeUser(user) {
   const { password, ...sanitizedUser } = user.dataValues;
   return sanitizedUser;
 }
+
+export function sanitizePassenger(passenger) {
+  if (!passenger) return null;
+  const {
+    password,
+    createdAt,
+    updatedAt,
+    email_verified,
+    is_verified,
+    type,
+    verificationToken,
+    ...sanitizedPassenger
+  } = passenger.dataValues;
+  return sanitizedPassenger;
+}

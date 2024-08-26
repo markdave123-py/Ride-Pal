@@ -17,19 +17,32 @@ const signupSchema = Joi.object({
   firstName: Joi.string().required().messages({
     "any.required": "First name is required",
   }),
-  password: Joi.string().min(8)
-  .max(30)
-  .pattern(new RegExp('(?=.*[a-z])')) 
-  .pattern(new RegExp('(?=.*[A-Z])'))
-  .pattern(new RegExp('(?=.*[0-9])'))
-  .pattern(new RegExp('(?=.*[!@#$%^&*(),.?":{}|<>])'))
-  .required()
-  .messages({
-    'string.min': 'Password must be at least 8 characters long.',
-    'string.max': 'Password must not exceed 30 characters.',
-    'string.pattern.base': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
-    'string.empty': 'Password is required.',
-  }),
+  password: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(new RegExp("(?=.*[a-z])"))
+    .pattern(new RegExp("(?=.*[A-Z])"))
+    .pattern(new RegExp("(?=.*[0-9])"))
+    .pattern(new RegExp('(?=.*[!@#$%^&*(),.?":{}|<>])'))
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long.",
+      "string.max": "Password must not exceed 30 characters.",
+      "string.pattern.base":
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      "string.empty": "Password is required.",
+    }),
+  phoneNumber: Joi.string()
+    .min(11)
+    .max(11)
+    .regex(/^[0-9]+$/)
+    .required()
+    .messages({
+      "string.min": "Phone number must be 11 characters long",
+      "string.max": "Phone number must be 11 characters long",
+      "string.pattern.base": "Phone number must contain only numbers",
+      "any.required": "phoneNumber is required",
+    }),
 
   lastName: Joi.string().optional(),
   profession: Joi.string().required().messages({

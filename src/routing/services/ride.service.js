@@ -3,6 +3,7 @@ import Ride from "../models/ride.js";
 import { VehicleService } from "../../user/driver/services/vehicle.services.js";
 import { UserService } from "../../user/driver/services/driver.services.js";
 import { isBeforeStartTime } from "../../core/utils/compareTime.js";
+import { sanitizePassenger } from "../../core/utils/sanitize.js";
 
 export class RideService {
 
@@ -46,7 +47,7 @@ export class RideService {
             const ride = await this.getRideByRouteId(route.id);
             const rideStartTime = new Date(ride.startTime);
             // return route
-            if (currentTime < rideStartTime && ride.status == "pending") {
+            if (ride.status == "pending") {
               return route;
             }
           }
@@ -188,24 +189,43 @@ export class RideService {
   }
 
   static async driverOngoingRide(driverId) {
-    const ride = Ride.findOne({
+    const ride = await Ride.findOne({
       where: {
-        driverId: driverId, status: "ongoing"
-      }
-    })
+        driverId,
+        status: "ongoing",
+      },
+    });
+
+    const passengers = ride.passengers;
+
+    for (let i = 0; i < passengers.length; i++) {
+      passengers[i] = sanitizePassenger(await UserService.getUserById(passengers[i]));
+    }
+
+    ride.passengers = passengers;
 
     return ride
   }
 
 
   static async getPendingRide(driverId) {
-    const rides = await Ride.findOne({
+    const ride = await Ride.findOne({
       where: {
         driverId,
         status: "pending"
       }
     })
 
-    return rides
+    const passengers = ride.passengers;
+
+    for (let i = 0; i < passengers.length; i++) {
+      passengers[i] = sanitizePassenger(
+        await UserService.getUserById(passengers[i])
+      );
+    }
+
+    ride.passengers = passengers;
+
+    return ride
   }
 }

@@ -20,6 +20,8 @@ export const startRide = async (req, res, next) => {
 
     const ride = await RideService.getRide(rideId);
 
+    // console.log(ride)
+
     if (!ride) {
       return next(new BadRequestError("No routes found"));
     }
@@ -34,7 +36,9 @@ export const startRide = async (req, res, next) => {
 
       const curTime = new Date();
 
-      if (curTime < startTime) return next(new ForbiddenError(`We have not reached the proposed start time ${ride.startTime} of this ride`))
+    // if (curTime < startTime) return next(new ForbiddenError(`We have not reached the proposed start time ${ride.startTime} of this ride`))
+
+    ride.startTime = curTime;
 
     ride.status = "ongoing";
 
