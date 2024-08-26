@@ -28,6 +28,7 @@ export const signUpDriver = async (req, res, next) => {
     color,
     model,
     seatNumber,
+    phoneNumber,
   } = req.body;
 
   try {
@@ -44,6 +45,7 @@ export const signUpDriver = async (req, res, next) => {
       color,
       model,
       seatNumber,
+      phoneNumber,
     };
 
     const workIDFile = req.file;
@@ -102,7 +104,8 @@ export const signUpDriver = async (req, res, next) => {
       profession,
       companyName,
       is_verified: false,
-      verificationToken
+      verificationToken,
+      phoneNumber
     });
 
     // Create the vehicle

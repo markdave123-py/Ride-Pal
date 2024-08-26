@@ -47,6 +47,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      defaultValue: "+2340000000000",
+    },
     companyName: {
       type: DataTypes.STRING,
       allowNull: false,

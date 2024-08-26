@@ -31,6 +31,12 @@ export const passengerSignupSchema = Joi.object({
     'string.empty': 'Password is required.',
   }),
   lastName: Joi.string().allow(null, ""),
+  phoneNumber: Joi.string().min(11).max(11).regex(/^[0-9]+$/).required().messages({
+    "string.min": "Phone number must be 11 characters long",
+    "string.max": "Phone number must be 11 characters long",
+    "string.pattern.base": "Phone number must contain only numbers",
+    "any.required": "phoneNumber is required",
+  }),
   profession: Joi.string().required().messages({
     "any.required": "Profession is required",
   }),
