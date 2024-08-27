@@ -4,9 +4,9 @@ import { VehicleService } from "../../user/driver/services/vehicle.services.js";
 import { UserService } from "../../user/driver/services/driver.services.js";
 import { isBeforeStartTime } from "../../core/utils/compareTime.js";
 import { sanitizePassenger } from "../../core/utils/sanitize.js";
+import { Op } from "sequelize";
 
 export class RideService {
-
   static async getAllRoutes(source, destination) {
     const routes = await Route.findAll({
       // where: {
@@ -170,6 +170,8 @@ export class RideService {
     }
   }
 
+
+
   static async countRide() {
     const count = await Ride.count();
     return count;
@@ -199,22 +201,23 @@ export class RideService {
     const passengers = ride.passengers;
 
     for (let i = 0; i < passengers.length; i++) {
-      passengers[i] = sanitizePassenger(await UserService.getUserById(passengers[i]));
+      passengers[i] = sanitizePassenger(
+        await UserService.getUserById(passengers[i])
+      );
     }
 
     ride.passengers = passengers;
 
-    return ride
+    return ride;
   }
-
 
   static async getPendingRide(driverId) {
     const ride = await Ride.findOne({
       where: {
         driverId,
-        status: "pending"
-      }
-    })
+        status: "pending",
+      },
+    });
 
     const passengers = ride.passengers;
 
@@ -226,6 +229,39 @@ export class RideService {
 
     ride.passengers = passengers;
 
+    return ride;
+  }
+
+  static async noncompletedLastRide(passengerId) {
+
+    const ride = await Ride.findOne({
+      where: {
+        passengers: {
+          [Op.contains]: [passengerId],
+        },
+        status: {
+          [Op.or]: ["pending", "ongoing"],
+        },
+      },
+      order: [["startTime", "DESC"]],
+    });
+
     return ride
+  }
+
+  static async getLastJoinedCompletedRide(passengerId) {
+    const ride = await Ride.findOne({
+      where: {
+        passengers: {
+          [Op.contains]: [passengerId],
+        },
+        status: "completed",
+      },
+      order: [["endTime", "DESC"]],
+    });
+
+    if (!ride) return false;
+
+    return ride;
   }
 }
