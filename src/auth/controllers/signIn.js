@@ -28,7 +28,8 @@ async function signIn(req, res, next) {
 
     let user = await User.findOne({ where: { email } });
 
-    let userType;[]
+    let userType;
+    [];
 
     if (user) {
       userType = user.type;
@@ -43,7 +44,7 @@ async function signIn(req, res, next) {
 
     if (!user) {
       logger.error(AppMessages.FAILURE.INVALID_CREDENTIALS);
-      return res.json({
+      return res.status(400).json({
         code: HttpStatus.BAD_REQUEST,
         message: AppMessages.FAILURE.INVALID_CREDENTIALS,
       });
@@ -98,7 +99,7 @@ async function signIn(req, res, next) {
         accessToken,
         refreshToken,
         user: sanitizeUser(user),
-        vechile: vechile
+        vechile: vechile,
       },
     });
   } catch (error) {
