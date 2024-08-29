@@ -8,6 +8,8 @@ import Route from "../../routing/models/routes.js";
 import Ride from "../../routing/models/ride.js";
 import { defaultAdmin } from "../../user/admin/controller/defaultAdmin.js";
 
+// import "./associations.js"
+
 export const initializeDbConnection = async () => {
   try {
     await sequelizeConn.authenticate();

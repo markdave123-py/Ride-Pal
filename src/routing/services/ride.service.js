@@ -1,10 +1,13 @@
 import Route from "../models/routes.js";
 import Ride from "../models/ride.js";
+import Rating from "../../rating/models/rate-ride.js";
 import { VehicleService } from "../../user/driver/services/vehicle.services.js";
 import { UserService } from "../../user/driver/services/driver.services.js";
 import { isBeforeStartTime } from "../../core/utils/compareTime.js";
 import { sanitizePassenger } from "../../core/utils/sanitize.js";
+import { RatingService } from "../../rating/services/rating.service.js";
 import { Op } from "sequelize";
+import { sequelizeConn } from "../../core/config/database.js";
 
 export class RideService {
   static async getAllRoutes(source, destination) {
@@ -170,8 +173,6 @@ export class RideService {
     }
   }
 
-
-
   static async countRide() {
     const count = await Ride.count();
     return count;
@@ -233,7 +234,6 @@ export class RideService {
   }
 
   static async noncompletedLastRide(passengerId) {
-
     const ride = await Ride.findOne({
       where: {
         passengers: {
@@ -246,7 +246,58 @@ export class RideService {
       order: [["startTime", "DESC"]],
     });
 
-    return ride
+    return ride;
+  }
+
+  // static async getCompletedUnratedRidesByPassenger(passengerId) {
+  //   const completedUnratedRides = await Ride.findAll({
+  //     where: {
+  //       status: "completed",
+  //       passengers: {
+  //         [Op.contains]: [passengerId],
+  //       },
+  //     },
+  //     include: [
+  //       {
+  //         model: Rating,
+  //         as: "ratings",
+  //         required: false,
+  //         where: {
+  //           raterId: passengerId,
+  //         },
+  //       },
+  //     ],
+  //     group: ["Ride.id"],
+  //     having: sequelizeConn.literal("COUNT(ratings.id) = 0"),
+  //   });
+
+  //   return completedUnratedRides;
+  // }
+
+  static async getCompletedUnratedRidesByPassenger(passengerId) {
+    // Subquery to get ride IDs that have been rated by the passenger
+    const ratedRideIds = await Rating.findAll({
+      attributes: ["rideId"],
+      where: {
+        raterId: passengerId,
+      },
+      group: ["rideId"],
+      raw: true,
+    }).then((results) => results.map((result) => result.rideId));
+
+    const completedUnratedRides = await Ride.findAll({
+      where: {
+        status: "completed",
+        id: {
+          [Op.notIn]: ratedRideIds,
+        },
+        passengers: {
+          [Op.contains]: [passengerId], 
+        },
+      },
+    });
+
+    return completedUnratedRides;
   }
 
   static async getLastJoinedCompletedRide(passengerId) {
@@ -261,6 +312,10 @@ export class RideService {
     });
 
     if (!ride) return false;
+
+    const rating = await RatingService.uniqueRating(passengerId, ride.id);
+
+    if (rating) return false;
 
     return ride;
   }

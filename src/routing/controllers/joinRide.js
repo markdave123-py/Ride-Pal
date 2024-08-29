@@ -68,10 +68,10 @@ export const lastJoinedCompletedRide = async (req, res, next) => {
       );
     }
 
-    const ride = await RideService.getLastJoinedCompletedRide(currUser.id);
+    const ride = await RideService.getCompletedUnratedRidesByPassenger(currUser.id);
 
-    if (!ride)
-      return next(new BadRequestError("You dont have any joined ride"));
+    if (ride.length === 0)
+      return next(new BadRequestError("You dont have any completed and non rated ride"));
 
     logger.info("Ride successfully retrived!!");
 
